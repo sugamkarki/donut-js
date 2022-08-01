@@ -8,8 +8,6 @@
     var A = 1,
       B = 1;
 
-    // This is copied, pasted, reformatted, and ported directly from my original
-    // donut.c code
     var asciiframe = function () {
       var b = [];
       var z = [];
@@ -24,16 +22,14 @@
         z[k] = 0;
       }
       for (var j = 0; j < 6.28; j += 0.07) {
-        // j <=> theta
         var ct = Math.cos(j),
           st = Math.sin(j);
         for (i = 0; i < 6.28; i += 0.02) {
-          // i <=> phi
           var sp = Math.sin(i),
             cp = Math.cos(i),
-            h = ct + 2, // R1 + R2*cos(theta)
-            D = 1 / (sp * h * sA + st * cA + 5), // this is 1/z
-            t = sp * h * cA - st * sA; // this is a clever factoring of some of the terms in x' and y'
+            h = ct + 2,
+            D = 1 / (sp * h * sA + st * cA + 5),
+            t = sp * h * cA - st * sA;
 
           var x = 0 | (40 + 30 * D * (cp * h * cB - t * sB)),
             y = 0 | (12 + 15 * D * (cp * h * sB + t * cB)),
@@ -64,7 +60,6 @@
       }
     };
 
-    // This is a reimplementation according to my math derivation on the page
     var R1 = 1;
     var R2 = 2;
     var K1 = 150;
@@ -75,31 +70,26 @@
       ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
       if (tmr1 === undefined) {
-        // only update A and B if the first animation isn't doing it already
         A += 0.07;
         B += 0.03;
       }
-      // precompute cosines and sines of A, B, theta, phi, same as before
       var cA = Math.cos(A),
         sA = Math.sin(A),
         cB = Math.cos(B),
         sB = Math.sin(B);
       for (var j = 0; j < 6.28; j += 0.3) {
-        // j <=> theta
         var ct = Math.cos(j),
-          st = Math.sin(j); // cosine theta, sine theta
+          st = Math.sin(j);
         for (i = 0; i < 6.28; i += 0.1) {
-          // i <=> phi
           var sp = Math.sin(i),
-            cp = Math.cos(i); // cosine phi, sine phi
-          var ox = R2 + R1 * ct, // object x, y = (R2,0,0) + (R1 cos theta, R1 sin theta, 0)
+            cp = Math.cos(i);
+          var ox = R2 + R1 * ct,
             oy = R1 * st;
-          var x = ox * (cB * cp + sA * sB * sp) - oy * cA * sB; // final 3D x coordinate
-          var y = ox * (sB * cp - sA * cB * sp) + oy * cA * cB; // final 3D y
-          var ooz = 1 / (K2 + cA * ox * sp + sA * oy); // one over z
-          var xp = 150 + K1 * ooz * x; // x' = screen space coordinate, translated and scaled to fit our 320x240 canvas element
-          var yp = 120 - K1 * ooz * y; // y' (it's negative here because in our output, positive y goes down but in our 3D space, positive y goes up)
-          // luminance, scaled back to 0 to 1
+          var x = ox * (cB * cp + sA * sB * sp) - oy * cA * sB;
+          var y = ox * (sB * cp - sA * cB * sp) + oy * cA * cB;
+          var ooz = 1 / (K2 + cA * ox * sp + sA * oy);
+          var xp = 150 + K1 * ooz * x;
+          var yp = 120 - K1 * ooz * y;
           var L =
             0.7 *
             (cp * ct * sB -
